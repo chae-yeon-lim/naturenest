@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Community Garden Dashboard</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      background-color: #f9fafb;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    /* Tabs */
+    .tabs {
+      display: flex;
+      background-color: #e5e7eb;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+    }
+    
+    .tab {
+      padding: 16px 24px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #6b7280;
+    }
+    
+    .tab.active {
+      background-color: white;
+      color: #111827;
+    }
+    
+    .tab-content {
+      display: none;
+      padding: 20px;
+      background-color: white;
+      border: 1px solid #e5e7eb;
+      border-top: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    /* Page header */
+    .page-header {
+      margin-bottom: 20px;
+    }
+    
+    .page-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+    }
+    
+    .page-description {
+      color: #6b7280;
+      margin: 0;
+    }
+    
+    /* Legend styles */
+    .legend {
+      background-color: #f3f4f6;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    
+    .legend-title {
+      font-weight: 600;
+      margin-bottom: 12px;
+      font-size: 0.875rem;
+    }
+    
+    .legend-sections {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    
+    .legend-section {
+      flex: 1;
+      min-width: 200px;
+    }
+    
+    .legend-subtitle {
+      font-weight: 500;
+      font-size: 0.75rem;
+      margin-bottom: 8px;
+      color: #4b5563;
+      text-transform: uppercase;
+    }
+    
+    .legend-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-right: 8px;
+    }
+    
+    .color-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    
+    .color-square {
+      width: 12px;
+      height: 12px;
+    }
+    
+    .legend-text {
+      font-size: 0.75rem;
+      color: #4b5563;
+    }
+    
+    /* Garden plots layout */
+    .plots-container {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    
+    .plot {
+      position: relative;
+      background-color: #dcedc8; /* Default medium */
+      border-radius: 8px;
+      padding: 12px;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      border-top: 3px solid #00796b;
+      transition: box-shadow 0.2s;
+    }
+    
+    .plot:hover {
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .plot.selected {
+      box-shadow: 0 0 0 2px #1e88e5;
+    }
+    
+    /* Special emphasis for Emma Wilson's plot */
+    .emma-wilson {
+      grid-column: span 2;
+      grid-row: span 2;
+      border: 2px solid #ff5722 !important;
+      box-shadow: 0 0 8px rgba(255, 87, 34, 0.4);
+    }
+    
+    .plot-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .gardener-name {
+      font-weight: 600;
+      font-size: 0.875rem;
+    }
+    
+    .focus-emoji {
+      font-size: 1.25rem;
+    }
+    
+    .plot-usage {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-bottom: 12px;
+    }
+    
+    .star-chart {
+      height: 80px;
+      width: 100%;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .module-scores {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 4px;
+      margin-top: 8px;
+    }
+    
+    .module-score {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .score-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    
+    .score-value {
+      font-size: 0.625rem;
+      color: #6b7280;
+    }
+
+    /* Plot details section */
+    .plot-details {
+      background-color: #f9fafb;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+      display: none;
+    }
+    
+    .detail-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    
+    .detail-title {
+      font-size: 1.125rem;
+      font-weight: 700;
+      margin: 0;
+    }
+    
+    .detail-subtitle {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+    
+    .emotion-display {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .emotion-emoji {
+      font-size: 1.5rem;
+    }
+    
+    .emotion-score {
+      font-size: 0.75rem;
+      color: #6b7280;
+    }
+    
+    .detail-content {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    
+    @media (min-width: 768px) {
+      .detail-content {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    .detail-section-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    .progress-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    
+    .progress-item {
+      display: flex;
+      align-items: center;
+    }
+    
+    .progress-label {
+      width: 140px;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    
+    .progress-bar {
+      flex: 1;
+      height: 8px;
+      background-color: #e5e7eb;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+    }
+    
+    .progress-value {
+      width: 36px;
+      text-align: right;
+      font-size: 0.75rem;
+      margin-left: 8px;
+    }
+    
+    .plant-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    
+    .plant-tag {
+      background-color: #d1fae5;
+      color: #065f46;
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      border-radius: 16px;
+    }
+    
+    .activity-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .activity-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .activity-color {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    
+    .activity-name {
+      flex: 1;
+      font-size: 0.875rem;
+    }
+    
+    .activity-frequency {
+      font-size: 0.75rem;
+      color: #6b7280;
+      background-color: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    
+    .insights-text {
+      font-size: 0.875rem;
+      color: #4b5563;
+      line-height: 1.5;
+    }
+
+    /* Stats cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .stat-card {
+      padding: 16px;
+      border-radius: 8px;
+    }
+    
+    .stat-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin: 0 0 8px 0;
+    }
+    
+    .stat-value {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .stat-icon {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+    }
+    
+    .stat-description {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+    
+    /* Progress meters */
+    .meter-container {
+      margin-top: 8px;
+    }
+    
+    .meter-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    
+    .meter-bar {
+      flex: 1;
+      height: 8px;
+      background-color: rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .meter-fill {
+      height: 100%;
+      border-radius: 4px;
+    }
+    
+    .meter-label {
+      font-size: 0.75rem;
+      width: 100px;
+    }
+
+    /* Student responses tab */
+    .student-container {
+      margin-bottom: 24px;
+    }
+    
+    .student-header {
+      margin-bottom: 12px;
+    }
+    
+    .student-name {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    .student-chart {
+      background-color: #eff6ff;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      height: 220px;
+    }
+    
+    .chart-carlos {
+      background-color: #f5f3ff;
+    }
+    
+    .student-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    
+    .student-stat {
+      background-color: #dbeafe;
+      border-radius: 8px;
+      padding: 12px;
+    }
+    
+    .carlos-stat {
+      background-color: #ede9fe;
+    }
+    
+    .stat-subtitle {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin: 0 0 4px 0;
+    }
+    
+    .stat-number {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #1d4ed8;
+      margin: 0;
+    }
+    
+    .carlos-number {
+      color: #6d28d9;
+    }
+    
+    .stat-text {
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin: 0;
+    }
+    
+    .student-activities {
+      background-color: #eff6ff;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 24px;
+    }
+    
+    .activities-carlos {
+      background-color: #f5f3ff;
+    }
+    
+    .activities-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #1d4ed8;
+      margin: 0 0 12px 0;
+    }
+    
+    .activities-title-carlos {
+      color: #6d28d9;
+    }
+    
+    .activities-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+    }
+    
+    .activity-card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 12px;
+    }
+    
+    .activity-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-bottom: 8px;
+    }
+    
+    .activity-module {
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin: 0 0 4px 0;
+    }
+    
+    .activity-text {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin: 0;
+    }
+    
+    .module-description {
+      background-color: #f9fafb;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+    
+    .module-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin: 0 0 12px 0;
+    }
+    
+    .module-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    
+    .module-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .module-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+    }
+    
+    .module-name {
+      font-size: 0.875rem;
+    }
+    
+    .timeframe-selector {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    
+    .timeframe-button {
+      background-color: #f3f4f6;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      cursor: pointer;
+    }
+    
+    .timeframe-button.active {
+      background-color: #d1fae5;
+      color: #065f46;
+      font-weight: 500;
+    }
+    
+    .context-section {
+      background-color: #ecfdf5;
+      border-radius: 8px;
+      padding: 16px;
+    }
+    
+    .context-title {
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin: 0 0 12px 0;
+    }
+    
+    .context-text {
+      font-size: 0.75rem;
+      color: #4b5563;
+      margin: 0 0 12px 0;
+      line-height: 1.5;
+    }
+    
+    .notes-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #4b5563;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="tabs">
+      <div class="tab active" id="tab-garden-plots">Garden Plots</div>
+      <div class="tab" id="tab-student-responses">Student Responses</div>
+    </div>
+    
+    <!-- Garden Plots Tab Content -->
+    <div class="tab-content active" id="content-garden-plots">
+      <div class="page-header">
+        <h1 class="page-title">Individual Garden Plots</h1>
+        <p class="page-description">Learning outcomes and emotional responses across individual garden plots</p>
+      </div>
+      
+      <!-- Legend -->
+      <div class="legend">
+        <h2 class="legend-title">Dashboard Legend</h2>
+        <div class="legend-sections">
+          <div class="legend-section">
+            <h3 class="legend-subtitle">Module Type Colors</h3>
+            <div class="legend-items">
+              <div class="legend-item">
+                <div class="color-dot" style="background-color: #67c1a3;"></div>
+                <span class="legend-text">Urban Nature</span>
+              </div>
+              <div class="legend-item">
+                <div class="color-dot" style="background-color: #6db4ea;"></div>
+                <span class="legend-text">Climate</span>
+              </div>
+              <div class="legend-item">
+                <div class="color-dot" style="background-color: #e582b4;"></div>
+                <span class="legend-text">Sustainable</span>
+              </div>
+              <div class="legend-item">
+                <div class="color-dot" style="background-color: #f0c675;"></div>
+                <span class="legend-text">Living Systems</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="legend-section">
+            <h3 class="legend-subtitle">Garden Focus Types</h3>
+            <div class="legend-items">
+              <div class="legend-item">
+                <span class="legend-text">🥕</span>
+                <span class="legend-text">Vegetables</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-text">🌿</span>
+                <span class="legend-text">Native Plants</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-text">🌱</span>
+                <span class="legend-text">Herbs</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-text">🐝</span>
+                <span class="legend-text">Pollinators</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-text">🌸</span>
+                <span class="legend-text">Flowers</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-text">🌳</span>
+                <span class="legend-text">Food Forest</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="legend-section">
+            <h3 class="legend-subtitle">Plot Usage Intensity</h3>
+            <div class="legend-items">
+              <div class="legend-item">
+                <div class="color-square" style="background-color: #b3e0c9;"></div>
+                <span class="legend-text">Very High</span>
+              </div>
+              <div class="legend-item">
+                <div class="color-square" style="background-color: #c8e6c9;"></div>
+                <span class="legend-text">High</span>
+              </div>
+              <div class="legend-item">
+                <div class="color-square" style="background-color: #dcedc8;"></div>
+                <span class="legend-text">Medium</span>
+              </div>
+              <div class="legend-item">
+                <div class="color-square" style="background-color: #f1f8e9;"></div>
+                <span class="legend-text">Low</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="legend-section">
+            <h3 class="legend-subtitle">Star Chart Elements</h3>
+            <div class="legend-items">
+              <div class="legend-item" style="width: 100%;">
+                <span class="legend-text"><b>Points:</b> Module completion % (farther = higher)</span>
+              </div>
+              <div class="legend-item" style="width: 100%;">
+                <span class="legend-text"><b>Center Emoji:</b> Emotional wellbeing (😟 to 😄)</span>
+              </div>
+              <div class="legend-item" style="width: 100%;">
+                <span class="legend-text"><b>Score Scale:</b> 😟(50) 🙁(60) 😐(70) 🙂(80) 😄(90)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Garden Plots -->
+      <div class="plots-container" id="plots-container">
+        <!-- Empty container that will be filled by JavaScript -->
+      </div>
+      
+      <!-- Selected Plot Details -->
+      <div class="plot-details" id="plot-details">
+        <!-- Will be filled when a plot is selected -->
+      </div>
+      
+      <!-- Garden Stats -->
+      <div class="stats-grid">
+        <div class="stat-card" style="background-color: #ecfdf5;">
+          <h3 class="stat-title">Strongest Module</h3>
+          <p class="stat-value">
+            <span class="stat-icon" style="background-color: #67c1a3;"></span>
+            Urban Nature
+          </p>
+          <p class="stat-description">Particularly strong in Native Plant plots</p>
+        </div>
+        
+        <div class="stat-card" style="background-color: #eff6ff;">
+          <h3 class="stat-title">Most Common Focus</h3>
+          <p class="stat-value">
+            <span>🥕</span>
+            Vegetables
+          </p>
+          <p class="stat-description">5 plots focused on vegetable growing</p>
+        </div>
+        
+        <div class="stat-card" style="background-color: #faf5ff;">
+          <h3 class="stat-title">Best Emotional Response</h3>
+          <p class="stat-value">
+            <span>🌳</span>
+            Food Forest 😄
+          </p>
+          <p class="stat-description">Average score of 87 across activities</p>
+        </div>
+        
+        <div class="stat-card" style="background-color: #fefce8;">
+          <h3 class="stat-title">Experience Distribution</h3>
+          <div class="meter-container">
+            <div class="meter-item">
+              <span class="meter-label">Beginner</span>
+              <div class="meter-bar">
+                <div class="meter-fill" style="width: 31%; background-color: #10b981;"></div>
+              </div>
+              <span class="meter-label" style="text-align: right;">31%</span>
+            </div>
+            <div class="meter-item">
+              <span class="meter-label">Intermediate</span>
+              <div class="meter-bar">
+                <div class="meter-fill" style="width: 38%; background-color: #3b82f6;"></div>
+              </div>
+              <span class="meter-label" style="text-align: right;">38%</span>
+            </div>
+            <div class="meter-item">
+              <span class="meter-label">Advanced</span>
+              <div class="meter-bar">
+                <div class="meter-fill" style="width: 31%; background-color: #8b5cf6;"></div>
+              </div>
+              <span class="meter-label" style="text-align: right;">31%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Student Responses Tab Content -->
+    <div class="tab-content" id="content-student-responses">
+      <div class="page-header">
+        <h1 class="page-title">Community Garden Emotional Response</h1>
+        <p class="page-description">Track emotional responses for students engaging with sustainability modules in the community garden</p>
+      </div>
+      
+      <div class="timeframe-selector">
+        <button class="timeframe-button" id="btn-month">Month</button>
+        <button class="timeframe-button active" id="btn-semester">Semester</button>
+        <button class="timeframe-button" id="btn-year">Year</button>
+      </div>
+      
+      <!-- Alice's data -->
+      <div class="student-container">
+        <div class="student-header">
+          <h2 class="student-name">Alice's Emotional Response</h2>
+        </div>
+        
+        <div class="student-chart">
+          <!-- Will be generated by JavaScript -->
+          <svg width="100%" height="100%" viewBox="0 0 700 200" id="alice-chart">
+            <!-- Background grid lines -->
+            <line x1="40" y1="25" x2="670" y2="25" stroke="#e5e7eb" stroke-dasharray="2,2" />
+            <line x1="40" y1="63.75" x2="670" y2="63.75" stroke="#e5e7eb" stroke-dasharray="2,2" />
+            <line x1="40" y1="102.5" x2="670" y2="102.5" stroke="#e5e7eb" stroke-dasharray="2,2" />
+            <line x1="40" y1="141.25" x2="670" y2="141.25" stroke="#e5e7eb" stroke-dasharray="2,2" />
+            <line x1="40" y1="180" x2="670" y2="180" stroke="#e5e7eb" stroke-dasharray="2,2" />
+            
+            <!-- Y-axis emotions -->
+            <text x="30" y="25" text-anchor="end" dominant-baseline="middle" font-size="14">😄</text>
+            <text x="30" y="63.75" text-anchor="end" dominant-baseline="middle" font-size="14">🙂</text>
+            <text x="30" y="102.5" text-anchor="end" dominant-baseline="middle" font-size="14">😐</text>
+            <text x="30" y="141.25" text-anchor="end" dominant-baseline="middle" font-size="14">🙁</text>
+            <text x="30" y="180" text-anchor="end" dominant-baseline="middle" font-size="14">😟</text>
+            
+            <!-- X-axis weeks -->
+            <text x="80" y="195" text-anchor="middle" font-size="10" fill="#6b7280">Week 1</text>
+            <text x="160" y="195" text-anchor="middle" font-size="10" fill="#6b7280">Week 3</text>
+            <text x="240" y="195" text-anchor="middle" font-size="10" fill="#6b7280">Week 5</text>
+            <text x="320" y="195" text-anchor="middle" font-size="10" fill="#6b7280">Week 7</text>
+            <text x="400" y="195" text-anchor="middle" font-size="10" fill="#6b7280">Week 9</text>
+            <text x="480" y="195" text-anchor="middle" font-size="10" fill="#6b7280">Week 11</text>
+            <text x="560" y="195" text-anchor="middle" font-size="10" fill="#6b7280">Week 13</text>
+            <text x="640" y="195" text-anchor="middle" font-size="10" fill="#6b7280">Week 15</text>
+            
+            <!-- Alice's emotional line -->
+            <path d="M80,102 L110,90 L140,70 L170,90 L200,110 L230,90 L260,70 L290,50 L320,80 L350,100 L380,120 L410,90 L440,60 L470,80 L500,100 L530,80 L560,60 L590,80 L620,90 L650,70" fill="none" stroke="#3b82f6" stroke-width="2" />
+            
+            <!-- Data points with module colors -->
+            <circle cx="80" cy="102" r="6" fill="#67c1a3" stroke="#3b82f6" stroke-width="2" />
+            <circle cx="110" cy="90" r="6" fill="#6db4ea" stroke="#3b82f6" stroke-width="2" />
+            <circle cx="140" cy="70" r="6" fill="#e582b4" stroke="#3b82f6" stroke-width="2" />
+            <circle cx="170" cy="90" r="6" fill="#f0c675" stroke="#3b82f6" stroke-width="2" />
+            <circle cx="200" cy="110" r="6" fill="#67c1a3" stroke="#3b82f6" stroke-width="2" />
+            <circle cx="230" cy="90" r="6" fill="#6db4ea" stroke="#3b82f6" stroke-width="2" />
+            <circle cx="260" cy="70" r="6" fill="#e582b4" stroke="#3b82f6" stroke-width="2" />
+            <circle cx="290" cy="50" r="6" fill="#f0c675" stroke="#3b82f6" stroke-width="2" />
+            <circle cx="320" cy="80" r="6" fill="#67c1a3" stroke="#3b82f6" stroke-width="2" />
+            <circle cx="350" cy="100" r="6" fill="#6db4ea" stroke="#3b82f6" stroke-width="2" />
+            <circle cx="380" cy="120" r="6" fill="#e582b4" stroke="#3b82f6" stroke-width="2" />
+            <circle cx="410" cy="90" r="6" fill="#f0c675" stroke="#3b82f6" stroke-width="2" />
+            <circle cx="440" cy="60" r="6" fill="#67c1a3" stroke="#3b82f6" stroke-width="2" />
+            <circle cx="470" cy="80" r="6" fill="#6db4ea" stroke="#3b82f6" stroke-width="2" />
+            <circle cx="500" cy="100" r="6" fill="#e582b4" stroke="#3b82f6" stroke-width="2" />
+            <circle cx="530" cy="80" r="6" fill="#f0c675" stroke="#3b82f6" stroke-width="2" />
+            <circle cx="560" cy="60" r="6" fill="#67c1a3" stroke="#3b82f6" stroke-width="2" />
+            <circle cx="590" cy="80" r="6" fill="#6db4ea" stroke="#3b82f6" stroke-width="2" />
+            <circle cx="620" cy="90" r="6" fill="#e582b4" stroke="#3b82f6" stroke-width="2" />
+            <circle cx="650" cy="70" r="6" fill="#f0c675" stroke="#3b82f6" stroke-width="2" />
+            
+            <!-- Chart title -->
+            <text x="350" y="15" text-anchor="middle" font-size="14" font-weight="bold" fill="#3b82f6">Alice's Emotional Response</text>
+          </svg>
+        </div>
+        
+        <div class="student-activities">
+          <h3 class="activities-title">Recent Garden Activities</h3>
+          <div class="activities-grid">
+            <div class="activity-card">
+              <div class="activity-indicator" style="background-color: #67c1a3;"></div>
+              <h4 class="activity-module">Urban Nature Discovery</h4>
+              <p class="activity-text">Local Plant Identification</p>
+            </div>
+            <div class="activity-card">
+              <div class="activity-indicator" style="background-color: #6db4ea;"></div>
+              <h4 class="activity-module">Climate Champions</h4>
+              <p class="activity-text">Water Conservation Practice</p>
+            </div>
+            <div class="activity-card">
+              <div class="activity-indicator" style="background-color: #f0c675;"></div>
+              <h4 class="activity-module">Living Systems</h4>
+              <p class="activity-text">Pollinator Habitat Creation</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="student-stats">
+          <div class="student-stat">
+            <p class="stat-subtitle">Average Score</p>
+            <p class="stat-number">73</p>
+          </div>
+          <div class="student-stat">
+            <p class="stat-subtitle">Most Used Module</p>
+            <p class="stat-text">Urban Nature Discovery</p>
+          </div>
+          <div class="student-stat">
+            <p class="stat-subtitle">Best Module</p>
+            <p class="stat-text">Climate Champions</p>
+            <p class="stat-subtitle">Avg. score: 78</p>
+          </div>
+          <div class="student-stat">
+            <p class="stat-subtitle">Score Range</p>
+            <p class="stat-text">58-91</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Carlos's data -->
+      <div class="student-container">
+        <div class="student-header">
+          <h2 class="student-name">Carlos's Emotional Response</h2>
+        </div>
+        
+        <div class="student-chart chart-carlos">
+          <!-- Will be generated by JavaScript -->
+          <svg width="100%" height="100%" viewBox="0 0 700 200" id="carlos-chart">
+            <!-- Background grid lines -->
+            <line x1="40" y1="25" x2="670" y2="25" stroke="#e5e7eb" stroke-dasharray="2,2" />
+            <line x1="40" y1="63.75" x2="670" y2="63.75" stroke="#e5e7eb" stroke-dasharray="2,2" />
+            <line x1="40" y1="102.5" x2="670" y2="102.5" stroke="#e5e7eb" stroke-dasharray="2,2" />
+            <line x1="40" y1="141.25" x2="670" y2="141.25" stroke="#e5e7eb" stroke-dasharray="2,2" />
+            <line x1="40" y1="180" x2="670" y2="180" stroke="#e5e7eb" stroke-dasharray="2,2" />
+            
+            <!-- Y-axis emotions -->
+            <text x="30" y="25" text-anchor="end" dominant-baseline="middle" font-size="14">😄</text>
+            <text x="30" y="63.75" text-anchor="end" dominant-baseline="middle" font-size="14">🙂</text>
+            <text x="30" y="102.5" text-anchor="end" dominant-baseline="middle" font-size="14">😐</text>
+            <text x="30" y="141.25" text-anchor="end" dominant-baseline="middle" font-size="14">🙁</text>
+            <text x="30" y="180" text-anchor="end" dominant-baseline="middle" font-size="14">😟</text>
+            
+            <!-- X-axis weeks -->
+            <text x="80" y="195" text-anchor="middle" font-size="10" fill="#6b7280">Week 1</text>
+            <text x="160" y="195" text-anchor="middle" font-size="10" fill="#6b7280">Week 3</text>
+            <text x="240" y="195" text-anchor="middle" font-size="10" fill="#6b7280">Week 5</text>
+            <text x="320" y="195" text-anchor="middle" font-size="10" fill="#6b7280">Week 7</text>
+            <text x="400" y="195" text-anchor="middle" font-size="10" fill="#6b7280">Week 9</text>
+            <text x="480" y="195" text-anchor="middle" font-size="10" fill="#6b7280">Week 11</text>
+            <text x="560" y="195" text-anchor="middle" font-size="10" fill="#6b7280">Week 13</text>
+            <text x="640" y="195" text-anchor="middle" font-size="10" fill="#6b7280">Week 15</text>
+            
+            <!-- Carlos's emotional line -->
+            <path d="M80,120 L110,100 L140,80 L170,60 L200,80 L230,100 L260,120 L290,100 L320,80 L350,60 L380,80 L410,100 L440,120 L470,100 L500,80 L530,60 L560,80 L590,100 L620,80 L650,60" fill="none" stroke="#8b5cf6" stroke-width="2" />
+            
+            <!-- Data points with module colors -->
+            <circle cx="80" cy="120" r="6" fill="#6db4ea" stroke="#8b5cf6" stroke-width="2" />
+            <circle cx="110" cy="100" r="6" fill="#e582b4" stroke="#8b5cf6" stroke-width="2" />
+            <circle cx="140" cy="80" r="6" fill="#f0c675" stroke="#8b5cf6" stroke-width="2" />
+            <circle cx="170" cy="60" r="6" fill="#67c1a3" stroke="#8b5cf6" stroke-width="2" />
+            <circle cx="200" cy="80" r="6" fill="#6db4ea" stroke="#8b5cf6" stroke-width="2" />
+            <circle cx="230" cy="100" r="6" fill="#e582b4" stroke="#8b5cf6" stroke-width="2" />
+            <circle cx="260" cy="120" r="6" fill="#f0c675" stroke="#8b5cf6" stroke-width="2" />
+            <circle cx="290" cy="100" r="6" fill="#67c1a3" stroke="#8b5cf6" stroke-width="2" />
+            <circle cx="320" cy="80" r="6" fill="#6db4ea" stroke="#8b5cf6" stroke-width="2" />
+            <circle cx="350" cy="60" r="6" fill="#e582b4" stroke="#8b5cf6" stroke-width="2" />
+            <circle cx="380" cy="80" r="6" fill="#f0c675" stroke="#8b5cf6" stroke-width="2" />
+            <circle cx="410" cy="100" r="6" fill="#67c1a3" stroke="#8b5cf6" stroke-width="2" />
+            <circle cx="440" cy="120" r="6" fill="#6db4ea" stroke="#8b5cf6" stroke-width="2" />
+            <circle cx="470" cy="100" r="6" fill="#e582b4" stroke="#8b5cf6" stroke-width="2" />
+            <circle cx="500" cy="80" r="6" fill="#f0c675" stroke="#8b5cf6" stroke-width="2" />
+            <circle cx="530" cy="60" r="6" fill="#67c1a3" stroke="#8b5cf6" stroke-width="2" />
+            <circle cx="560" cy="80" r="6" fill="#6db4ea" stroke="#8b5cf6" stroke-width="2" />
+            <circle cx="590" cy="100" r="6" fill="#e582b4" stroke="#8b5cf6" stroke-width="2" />
+            <circle cx="620" cy="80" r="6" fill="#f0c675" stroke="#8b5cf6" stroke-width="2" />
+            <circle cx="650" cy="60" r="6" fill="#67c1a3" stroke="#8b5cf6" stroke-width="2" />
+            
+            <!-- Chart title -->
+            <text x="350" y="15" text-anchor="middle" font-size="14" font-weight="bold" fill="#8b5cf6">Carlos's Emotional Response</text>
+          </svg>
+        </div>
+        
+        <div class="student-activities activities-carlos">
+          <h3 class="activities-title activities-title-carlos">Recent Garden Activities</h3>
+          <div class="activities-grid">
+            <div class="activity-card">
+              <div class="activity-indicator" style="background-color: #e582b4;"></div>
+              <h4 class="activity-module">Sustainable Communities</h4>
+              <p class="activity-text">Neighborhood Garden Design</p>
+            </div>
+            <div class="activity-card">
+              <div class="activity-indicator" style="background-color: #f0c675;"></div>
+              <h4 class="activity-module">Living Systems</h4>
+              <p class="activity-text">Food Web Mapping</p>
+            </div>
+            <div class="activity-card">
+              <div class="activity-indicator" style="background-color: #67c1a3;"></div>
+              <h4 class="activity-module">Urban Nature Discovery</h4>
+              <p class="activity-text">Native Garden Planning</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="student-stats">
+          <div class="student-stat carlos-stat">
+            <p class="stat-subtitle">Average Score</p>
+            <p class="stat-number carlos-number">68</p>
+          </div>
+          <div class="student-stat carlos-stat">
+            <p class="stat-subtitle">Most Used Module</p>
+            <p class="stat-text">Living Systems</p>
+          </div>
+          <div class="student-stat carlos-stat">
+            <p class="stat-subtitle">Best Module</p>
+            <p class="stat-text">Urban Nature Discovery</p>
+            <p class="stat-subtitle">Avg. score: 74</p>
+          </div>
+          <div class="student-stat carlos-stat">
+            <p class="stat-subtitle">Score Range</p>
+            <p class="stat-text">52-86</p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="module-description">
+        <h3 class="module-title">Sustainability Modules:</h3>
+        <div class="module-items">
+          <div class="module-item">
+            <div class="module-color" style="background-color: #67c1a3;"></div>
+            <span class="module-name">Urban Nature Discovery</span>
+          </div>
+          <div class="module-item">
+            <div class="module-color" style="background-color: #6db4ea;"></div>
+            <span class="module-name">Climate Champions</span>
+          </div>
+          <div class="module-item">
+            <div class="module-color" style="background-color: #e582b4;"></div>
+            <span class="module-name">Sustainable Communities</span>
+          </div>
+          <div class="module-item">
+            <div class="module-color" style="background-color: #f0c675;"></div>
+            <span class="module-name">Living Systems</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="context-section">
+        <h3 class="context-title">Community Garden Context:</h3>
+        <p class="context-text">
+          These charts track emotional responses as students engage with sustainability modules in our community garden space. 
+          Both students show varying emotional patterns without consistent upward trends, highlighting the complex relationship 
+          between garden activities and emotional states.
+        </p>
+        
+        <p class="context-text">
+          <span class="notes-title">Garden Facilitator Notes: </span>
+          Emotional fluctuations appear related to specific module activities rather than overall progression. 
+          Consider offering students more choice in module selection based on their emotional response patterns. 
+          The community garden provides a valuable space for observing authentic emotional responses to sustainability education.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Sample data
+    const modules = [
+      { id: 'urban-nature', name: 'Urban Nature Discovery', color: '#67c1a3' },
+      { id: 'climate', name: 'Climate Champions', color: '#6db4ea' },
+      { id: 'sustainable', name: 'Sustainable Communities', color: '#e582b4' },
+      { id: 'living', name: 'Living Systems', color: '#f0c675' }
+    ];
+    
+    const gardeners = [
+      { id: 1, name: 'Alice Chen', experience: 'Intermediate', focus: 'Vegetables', years: 3, usage: 'High' },
+      { id: 2, name: 'Marcus Johnson', experience: 'Advanced', focus: 'Native Plants', years: 7, usage: 'Very High' },
+      { id: 3, name: 'Sofia Rodriguez', experience: 'Beginner', focus: 'Herbs', years: 1, usage: 'Medium' },
+      { id: 4, name: 'David Kim', experience: 'Advanced', focus: 'Pollinators', years: 10, usage: 'Very High' },
+      { id: 5, name: 'Priya Patel', experience: 'Intermediate', focus: 'Vegetables', years: 4, usage: 'High' },
+      { id: 6, name: 'Jamal Washington', experience: 'Beginner', focus: 'Herbs', years: 1, usage: 'Low' },
+      { id: 7, name: 'Emma Wilson', experience: 'Intermediate', focus: 'Flowers', years: 5, usage: 'Medium' },
+      { id: 8, name: 'Raj Sharma', experience: 'Advanced', focus: 'Vegetables', years: 8, usage: 'High' },
+      { id: 9, name: 'Olivia Martinez', experience: 'Beginner', focus: 'Flowers', years: 2, usage: 'Medium' },
+      { id: 10, name: 'Thomas Lee', experience: 'Advanced', focus: 'Food Forest', years: 6, usage: 'Very High' }
+    ];
+    
+    // Precomputed module scores for each gardener
+    const gardenerModuleScores = [
+      // Alice Chen
+      { 'urban-nature': 65, 'climate': 45, 'sustainable': 85, 'living': 60 },
+      // Marcus Johnson
+      { 'urban-nature': 95, 'climate': 70, 'sustainable': 50, 'living': 80 },
+      // Sofia Rodriguez
+      { 'urban-nature': 60, 'climate': 30, 'sustainable': 55, 'living': 50 },
+      // David Kim
+      { 'urban-nature': 85, 'climate': 60, 'sustainable': 55, 'living': 95 },
+      // Priya Patel
+      { 'urban-nature': 70, 'climate': 50, 'sustainable': 90, 'living': 60 },
+      // Jamal Washington
+      { 'urban-nature': 60, 'climate': 30, 'sustainable': 55, 'living': 50 },
+      // Emma Wilson - special featured plot
+      { 'urban-nature': 75, 'climate': 45, 'sustainable': 65, 'living': 75 },
+      // Raj Sharma
+      { 'urban-nature': 70, 'climate': 50, 'sustainable': 90, 'living': 60 },
+      // Olivia Martinez
+      { 'urban-nature': 55, 'climate': 35, 'sustainable': 45, 'living': 55 },
+      // Thomas Lee
+      { 'urban-nature': 95, 'climate': 80, 'sustainable': 85, 'living': 95 }
+    ];
+    
+    // Emotional scores for each gardener
+    const emotionalScores = [75, 85, 65, 88, 78, 62, 76, 82, 67, 90];
+    
+    // Calculate activities based on focus
+    function getActivitiesForGardener(gardener) {
+      const activities = [];
+      
+      switch(gardener.focus) {
+        case 'Vegetables':
+          activities.push(
+            { name: 'Heirloom Seed Saving', module: 'urban-nature', frequency: 'Weekly' },
+            { name: 'Water Conservation', module: 'climate', frequency: 'Daily' },
+            { name: 'Food Sharing', module: 'sustainable', frequency: 'Bi-weekly' }
+          );
+          break;
+        case 'Native Plants':
+          activities.push(
+            { name: 'Biodiversity Monitoring', module: 'urban-nature', frequency: 'Weekly' },
+            { name: 'Drought Resistance Demo', module: 'climate', frequency: 'Monthly' },
+            { name: 'Indigenous Knowledge Sharing', module: 'sustainable', frequency: 'Monthly' }
+          );
+          break;
+        case 'Herbs':
+          activities.push(
+            { name: 'Medicinal Plant Care', module: 'urban-nature', frequency: 'Weekly' },
+            { name: 'Companion Planting', module: 'living', frequency: 'Monthly' },
+            { name: 'Community Herb Sharing', module: 'sustainable', frequency: 'Bi-weekly' }
+          );
+          break;
+        case 'Pollinators':
+          activities.push(
+            { name: 'Bee Habitat Creation', module: 'living', frequency: 'Monthly' },
+            { name: 'Butterfly Monitoring', module: 'urban-nature', frequency: 'Weekly' },
+            { name: 'Pollinator Education', module: 'sustainable', frequency: 'Monthly' }
+          );
+          break;
+        case 'Flowers':
+          activities.push(
+            { name: 'Seasonal Blooming', module: 'urban-nature', frequency: 'Monthly' },
+            { name: 'Cutting Garden', module: 'sustainable', frequency: 'Weekly' },
+            { name: 'Pollinator Support', module: 'living', frequency: 'Daily' }
+          );
+          break;
+        case 'Food Forest':
+          activities.push(
+            { name: 'Ecosystem Design', module: 'urban-nature', frequency: 'Monthly' },
+            { name: 'Carbon Sequestration', module: 'climate', frequency: 'Ongoing' },
+            { name: 'Multi-layer Planting', module: 'living', frequency: 'Seasonal' }
+          );
+          break;
+        default:
+          activities.push(
+            { name: 'Garden Activity', module: 'sustainable', frequency: 'Weekly' }
+          );
+      }
+      
+      return activities;
+    }
+    
+    // Get plants based on focus
+    function getPlantsForGardener(gardener) {
+      switch(gardener.focus) {
+        case 'Vegetables':
+          return ['Tomatoes', 'Peppers', 'Kale', 'Carrots'];
+        case 'Herbs':
+          return ['Basil', 'Mint', 'Rosemary', 'Thyme'];
+        case 'Native Plants':
+          return ['Milkweed', 'Coneflower', 'Goldenrod'];
+        case 'Pollinators':
+          return ['Lavender', 'Bee Balm', 'Sunflower'];
+        case 'Flowers':
+          return ['Zinnia', 'Marigold', 'Cosmos'];
+        case 'Food Forest':
+          return ['Apple Trees', 'Berry Bushes', 'Ground Herbs'];
+        default:
+          return ['Various Plants'];
+      }
+    }
+    
+    // Helper functions
+    function getFocusEmoji(focus) {
+      switch(focus) {
+        case 'Vegetables': return "🥕";
+        case 'Native Plants': return "🌿";
+        case 'Herbs': return "🌱";
+        case 'Pollinators': return "🐝";
+        case 'Flowers': return "🌸";
+        case 'Food Forest': return "🌳";
+        default: return "🌱";
+      }
+    }
+    
+    function getPlotBackgroundColor(usage) {
+      switch(usage) {
+        case 'Very High': return "#b3e0c9";
+        case 'High': return "#c8e6c9";
+        case 'Medium': return "#dcedc8";
+        case 'Low': return "#f1f8e9";
+        default: return "#e5e7eb";
+      }
+    }
+    
+    function getPlotBorderColor(focus) {
+      switch(focus) {
+        case 'Vegetables': return '#43a047';
+        case 'Native Plants': return '#1976d2';
+        case 'Herbs': return '#8e24aa';
+        case 'Pollinators': return '#ffa000';
+        case 'Flowers': return '#e64a19';
+        case 'Food Forest': return '#795548';
+        default: return '#757575';
+      }
+    }
+    
+    function getEmotionEmoji(score) {
+      if (score >= 85) return "😄";
+      if (score >= 70) return "🙂";
+      if (score >= 55) return "😐";
+      if (score >= 40) return "🙁";
+      return "😟";
+    }
+    
+    // Create SVG star chart
+    function createStarChart(moduleScores, emotionalScore, size) {
+      const starSize = size || 30;
+      const points = [];
+      
+      // Calculate points for each module
+      modules.forEach((module, i) => {
+        const angle = (Math.PI * 2 * i) / modules.length;
+        const score = moduleScores[module.id] / 100;
+        const distance = starSize * score;
+        
+        points.push({
+          x: starSize + distance * Math.cos(angle - Math.PI/2),
+          y: starSize + distance * Math.sin(angle - Math.PI/2),
+          module: module
+        });
+      });
+      
+      // Create SVG
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("width", starSize * 2);
+      svg.setAttribute("height", starSize * 2 + 15);
+      svg.setAttribute("viewBox", `0 0 ${starSize * 2} ${starSize * 2 + 15}`);
+      
+      // Create stem
+      const stem = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      stem.setAttribute("x1", starSize);
+      stem.setAttribute("y1", starSize * 2);
+      stem.setAttribute("x2", starSize);
+      stem.setAttribute("y2", starSize * 2 + 15);
+      stem.setAttribute("stroke", "#43a047");
+      stem.setAttribute("stroke-width", "2");
+      svg.appendChild(stem);
+      
+      // Create axis lines
+      modules.forEach((module, i) => {
+        const angle = (Math.PI * 2 * i) / modules.length - Math.PI/2;
+        const x2 = starSize + starSize * Math.cos(angle);
+        const y2 = starSize + starSize * Math.sin(angle);
+        
+        const axis = document.createElementNS("http://www.w3.org/2000/svg", "line");
+        axis.setAttribute("x1", starSize);
+        axis.setAttribute("y1", starSize);
+        axis.setAttribute("x2", x2);
+        axis.setAttribute("y2", y2);
+        axis.setAttribute("stroke", module.color);
+        axis.setAttribute("stroke-width", "1");
+        axis.setAttribute("stroke-dasharray", "2,2");
+        axis.setAttribute("stroke-opacity", "0.6");
+        svg.appendChild(axis);
+      });
+      
+      // Create star shape
+      const pathData = points.map((point, i) => 
+        `${i === 0 ? 'M' : 'L'}${point.x},${point.y}`
+      ).join(' ') + 'Z';
+      
+      const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      path.setAttribute("d", pathData);
+      path.setAttribute("fill", "#6d8eff");
+      path.setAttribute("fill-opacity", "0.4");
+      path.setAttribute("stroke", "#4a67d9");
+      path.setAttribute("stroke-width", "1.5");
+      svg.appendChild(path);
+      
+      // Create vertex points
+      points.forEach((point) => {
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", point.x);
+        circle.setAttribute("cy", point.y);
+        circle.setAttribute("r", "6");
+        circle.setAttribute("fill", point.module.color);
+        circle.setAttribute("stroke", "white");
+        circle.setAttribute("stroke-width", "1");
+        svg.appendChild(circle);
+      });
+      
+      // Create emotion emoji
+      const emoji = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      emoji.setAttribute("x", starSize);
+      emoji.setAttribute("y", starSize);
+      emoji.setAttribute("font-size", "16");
+      emoji.setAttribute("text-anchor", "middle");
+      emoji.setAttribute("dominant-baseline", "middle");
+      emoji.textContent = getEmotionEmoji(emotionalScore);
+      svg.appendChild(emoji);
+      
+      return svg;
+    }
+    
+    // Create plot elements
+    function createPlotElement(gardener, index) {
+      const moduleScores = gardenerModuleScores[index];
+      const emotionalScore = emotionalScores[index];
+      const isEmmaWilson = gardener.id === 7;
+      
+      const plotEl = document.createElement('div');
+      plotEl.className = `plot ${isEmmaWilson ? 'emma-wilson' : ''}`;
+      plotEl.id = `plot-${gardener.id}`;
+      plotEl.style.backgroundColor = getPlotBackgroundColor(gardener.usage);
+      plotEl.style.borderTop = `3px solid ${getPlotBorderColor(gardener.focus)}`;
+      
+      // Header with name and emoji
+      const headerEl = document.createElement('div');
+      headerEl.className = 'plot-header';
+      
+      const nameEl = document.createElement('div');
+      nameEl.className = 'gardener-name';
+      nameEl.textContent = gardener.name;
+      
+      const emojiEl = document.createElement('div');
+      emojiEl.className = 'focus-emoji';
+      emojiEl.textContent = getFocusEmoji(gardener.focus);
+      
+      headerEl.appendChild(nameEl);
+      headerEl.appendChild(emojiEl);
+      plotEl.appendChild(headerEl);
+      
+      // Usage text
+      const usageEl = document.createElement('div');
+      usageEl.className = 'plot-usage';
+      usageEl.textContent = `Usage: ${gardener.usage}`;
+      plotEl.appendChild(usageEl);
+      
+      // Star chart
+      const starChartEl = document.createElement('div');
+      starChartEl.className = 'star-chart';
+      const svg = createStarChart(moduleScores, emotionalScore, isEmmaWilson ? 40 : 30);
+      starChartEl.appendChild(svg);
+      plotEl.appendChild(starChartEl);
+      
+      // Module scores
+      const scoresEl = document.createElement('div');
+      scoresEl.className = 'module-scores';
+      
+      modules.forEach(module => {
+        const scoreItem = document.createElement('div');
+        scoreItem.className = 'module-score';
+        
+        const dot = document.createElement('div');
+        dot.className = 'score-dot';
+        dot.style.backgroundColor = module.color;
+        
+        const value = document.createElement('div');
+        value.className = 'score-value';
+        value.textContent = moduleScores[module.id];
+        
+        scoreItem.appendChild(dot);
+        scoreItem.appendChild(value);
+        scoresEl.appendChild(scoreItem);
+      });
+      
+      // Only add scores to Emma Wilson's plot by default
+      if (isEmmaWilson) {
+        plotEl.appendChild(scoresEl);
+      } else {
+        // Create but hide scores, will show on hover/click
+        scoresEl.style.display = 'none';
+        plotEl.appendChild(scoresEl);
+      }
+      
+      // Add event listeners
+      plotEl.addEventListener('mouseenter', () => {
+        if (!isEmmaWilson) {
+          scoresEl.style.display = 'grid';
+        }
+        plotEl.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+      });
+      
+      plotEl.addEventListener('mouseleave', () => {
+        if (!isEmmaWilson && !plotEl.classList.contains('selected')) {
+          scoresEl.style.display = 'none';
+        }
+        if (!plotEl.classList.contains('selected')) {
+          plotEl.style.boxShadow = '0 1px 3px rgba(0, 0, 0, 0.1)';
+        }
+      });
+      
+      plotEl.addEventListener('click', () => {
+        // Toggle selection
+        const wasSelected = plotEl.classList.contains('selected');
+        
+        // Clear all selections first
+        document.querySelectorAll('.plot').forEach(p => {
+          p.classList.remove('selected');
+          if (p.id !== `plot-${gardener.id}` && p.id !== 'plot-7') { // Leave Emma Wilson's scores visible
+            p.querySelector('.module-scores').style.display = 'none';
+          }
+        });
+        
+        if (!wasSelected) {
+          // Select this plot
+          plotEl.classList.add('selected');
+          scoresEl.style.display = 'grid';
+          showPlotDetails(gardener, moduleScores, emotionalScore);
+        } else {
+          // Hide details when deselecting
+          hidePlotDetails();
+        }
+      });
+      
+      return plotEl;
+    }
+    
+    // Show detailed information about a selected plot
+    function showPlotDetails(gardener, moduleScores, emotionalScore) {
+      const detailsEl = document.getElementById('plot-details');
+      const activities = getActivitiesForGardener(gardener);
+      const plants = getPlantsForGardener(gardener);
+      
+      // Find top modules for this gardener
+      const topModules = [...modules]
+        .map(m => ({ ...m, score: moduleScores[m.id] }))
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 2)
+        .map(m => m.name);
+      
+      // Determine emotional text based on score
+      let emotionalText = '';
+      if (emotionalScore >= 80) {
+        emotionalText = 'Emotional response is very positive, suggesting high satisfaction and engagement.';
+      } else if (emotionalScore >= 70) {
+        emotionalText = 'Emotional response is positive, showing good engagement with garden activities.';
+      } else {
+        emotionalText = 'Emotional response shows moderate engagement with room for improvement.';
+      }
+      
+      detailsEl.innerHTML = `
+        <div class="detail-header">
+          <div>
+            <h2 class="detail-title">Plot ${gardener.id}: ${gardener.name}</h2>
+            <p class="detail-subtitle">
+              Focus: ${gardener.focus} | Experience: ${gardener.experience} | Years Gardening: ${gardener.years}
+            </p>
+          </div>
+          <div class="emotion-display">
+            <div class="emotion-emoji">${getEmotionEmoji(emotionalScore)}</div>
+            <div class="emotion-score">(${emotionalScore})</div>
+          </div>
+        </div>
+        
+        <div class="detail-content">
+          <div>
+            <h3 class="detail-section-title">Module Learning Outcomes</h3>
+            <div class="progress-bars">
+              ${modules.map(module => `
+                <div class="progress-item">
+                  <div class="progress-label">
+                    <div class="color-dot" style="background-color: ${module.color};"></div>
+                    ${module.name}:
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${moduleScores[module.id]}%; background-color: ${module.color};"></div>
+                  </div>
+                  <div class="progress-value">${moduleScores[module.id]}%</div>
+                </div>
+              `).join('')}
+            </div>
+            
+            <h3 class="detail-section-title">Plants & Crops</h3>
+            <div class="plant-tags">
+              ${plants.map(plant => `<div class="plant-tag">${plant}</div>`).join('')}
+            </div>
+          </div>
+          
+          <div>
+            <h3 class="detail-section-title">Learning Activities</h3>
+            <ul class="activity-list">
+              ${activities.map(activity => {
+                const module = modules.find(m => m.id === activity.module);
+                
+                return `<li class="activity-item">
+                  <div class="activity-color" style="background-color: ${module.color};"></div>
+                  <span class="activity-name">${activity.name}</span>
+                  <span class="activity-frequency">${activity.frequency}</span>
+                </li>`;
+              }).join('')}
+            </ul>
+            
+            <h3 class="detail-section-title">Sustainability Insights</h3>
+            <p class="insights-text">
+              ${gardener.name}'s plot demonstrates strong outcomes in 
+              ${topModules.join(' and')}. 
+              ${emotionalText}
+            </p>
+          </div>
+        </div>
+      `;
+      
+      detailsEl.style.display = 'block';
+    }
+    
+    // Hide plot details section
+    function hidePlotDetails() {
+      const detailsEl = document.getElementById('plot-details');
+      detailsEl.style.display = 'none';
+    }
+    
+    // Set up tab navigation
+    function setupTabs() {
+      const tabs = document.querySelectorAll('.tab');
+      const contents = document.querySelectorAll('.tab-content');
+      
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          // Remove active class from all tabs
+          tabs.forEach(t => t.classList.remove('active'));
+          // Add active class to clicked tab
+          tab.classList.add('active');
+          
+          // Hide all content sections
+          contents.forEach(content => content.classList.remove('active'));
+          
+          // Show the selected content
+          const tabId = tab.id;
+          const contentId = tabId.replace('tab-', 'content-');
+          document.getElementById(contentId).classList.add('active');
+        });
+      });
+    }
+    
+    // Set up timeframe buttons
+    function setupTimeframeButtons() {
+      const buttons = document.querySelectorAll('.timeframe-button');
+      
+      buttons.forEach(button => {
+        button.addEventListener('click', () => {
+          // Remove active class from all buttons
+          buttons.forEach(b => b.classList.remove('active'));
+          // Add active class to clicked button
+          button.classList.add('active');
+          
+          // In a real implementation, this would update the charts
+          // For demo purposes, we'll just change the button state
+        });
+      });
+    }
+    
+    // Initialize the garden plots
+    function initializePlots() {
+      const container = document.getElementById('plots-container');
+      
+      gardeners.forEach((gardener, index) => {
+        const plotEl = createPlotElement(gardener, index);
+        container.appendChild(plotEl);
+      });
+    }
+    
+    // Initialize everything when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      setupTabs();
+      setupTimeframeButtons();
+      initializePlots();
+    });
+  </script>
+</body>
+</html>
