@@ -656,6 +656,71 @@
       font-weight: 600;
       color: #4b5563;
     }
+
+    /* Enhanced Emma Wilson plot styles */
+    .gardener-info {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin: 0;
+      line-height: 1.2;
+    }
+
+    .plants-section {
+      margin-bottom: 12px;
+    }
+
+    .plants-header {
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin: 0 0 5px 0;
+    }
+
+    /* Overrides for Emma Wilson's plot */
+    .emma-wilson .plant-tag {
+      background-color: rgba(229, 130, 180, 0.2);
+      color: #e5328b;
+      padding: 2px 6px;
+    }
+
+    .module-scores-container {
+      margin-bottom: 10px;
+    }
+
+    .module-scores-header {
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin: 0 0 5px 0;
+    }
+
+    .score-label {
+      font-size: 0.625rem;
+      color: #6b7280;
+      margin-right: 2px;
+    }
+
+    .star-chart-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .emotional-response {
+      text-align: center;
+      margin-top: 4px;
+    }
+
+    .response-label {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin: 0;
+    }
+
+    .response-value {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #4b5563;
+      margin: 0;
+    }
   </style>
 </head>
 <body>
@@ -1231,6 +1296,16 @@
     function generateModuleScores(gardener) {
       let moduleScores = {};
       
+      // Special case for Emma Wilson
+      if (gardener.id === 7) {
+        return {
+          'urban-nature': 75,
+          'climate': 45,
+          'sustainable': 59,
+          'living': 75
+        };
+      }
+      
       // Adjust module strengths based on gardener focus
       if (gardener.focus === 'Vegetables') {
         moduleScores = {
@@ -1300,6 +1375,11 @@
     
     // Calculate emotional score based on gardener characteristics
     function calculateEmotionalScore(gardener) {
+      // Special case for Emma Wilson
+      if (gardener.id === 7) {
+        return 83;
+      }
+      
       const baseEmotion = 60;
       const experienceBonus = gardener.experience === 'Advanced' ? 15 : 
                            gardener.experience === 'Intermediate' ? 10 : 5;
@@ -1457,6 +1537,11 @@
     
     // Get plants based on focus
     function getPlantsForGardener(gardener) {
+      // Special case for Emma Wilson
+      if (gardener.id === 7) {
+        return ['Zinnia', 'Marigold', 'Cosmos'];
+      }
+      
       switch(gardener.focus) {
         case 'Vegetables':
           return ['Tomatoes', 'Peppers', 'Kale', 'Carrots'];
@@ -1489,6 +1574,136 @@
       plotEl.style.backgroundColor = getPlotBackgroundColor(gardener.usage);
       plotEl.style.borderTop = `3px solid ${getPlotBorderColor(gardener.focus)}`;
       
+      // Special treatment for Emma Wilson's plot
+      if (isEmmaWilson) {
+        // Plot Header
+        const headerEl = document.createElement('div');
+        headerEl.className = 'plot-header';
+        
+        const nameEl = document.createElement('div');
+        nameEl.className = 'gardener-name';
+        nameEl.textContent = gardener.name;
+        
+        const emojiEl = document.createElement('div');
+        emojiEl.className = 'focus-emoji';
+        emojiEl.textContent = getFocusEmoji(gardener.focus);
+        
+        headerEl.appendChild(nameEl);
+        headerEl.appendChild(emojiEl);
+        plotEl.appendChild(headerEl);
+        
+        // Gardener Info
+        const detailsEl = document.createElement('div');
+        detailsEl.className = 'plot-details';
+        
+        const infoEl1 = document.createElement('p');
+        infoEl1.className = 'gardener-info';
+        infoEl1.textContent = gardener.experience + ' Gardener';
+        
+        const infoEl2 = document.createElement('p');
+        infoEl2.className = 'gardener-info';
+        infoEl2.textContent = gardener.years + ' years experience';
+        
+        const usageEl = document.createElement('p');
+        usageEl.className = 'plot-usage';
+        usageEl.textContent = gardener.usage + ' Usage';
+        
+        detailsEl.appendChild(infoEl1);
+        detailsEl.appendChild(infoEl2);
+        detailsEl.appendChild(usageEl);
+        plotEl.appendChild(detailsEl);
+        
+        // Plants Section
+        const plantsEl = document.createElement('div');
+        plantsEl.className = 'plants-section';
+        
+        const plantsHeader = document.createElement('p');
+        plantsHeader.className = 'plants-header';
+        plantsHeader.textContent = 'Growing:';
+        
+        const plantsTagsEl = document.createElement('div');
+        plantsTagsEl.className = 'plant-tags';
+        
+        const plants = getPlantsForGardener(gardener);
+        plants.forEach(plant => {
+          const plantTag = document.createElement('span');
+          plantTag.className = 'plant-tag';
+          plantTag.textContent = plant;
+          plantsTagsEl.appendChild(plantTag);
+        });
+        
+        plantsEl.appendChild(plantsHeader);
+        plantsEl.appendChild(plantsTagsEl);
+        plotEl.appendChild(plantsEl);
+        
+        // Module Scores
+        const scoresContainerEl = document.createElement('div');
+        scoresContainerEl.className = 'module-scores-container';
+        
+        const scoresHeader = document.createElement('p');
+        scoresHeader.className = 'module-scores-header';
+        scoresHeader.textContent = 'Module Scores:';
+        
+        const scoresEl = document.createElement('div');
+        scoresEl.className = 'module-scores';
+        
+        modules.forEach(module => {
+          const scoreItem = document.createElement('div');
+          scoreItem.className = 'module-score';
+          
+          const dot = document.createElement('div');
+          dot.className = 'score-dot';
+          dot.style.backgroundColor = module.color;
+          
+          const label = document.createElement('span');
+          label.className = 'score-label';
+          label.textContent = module.name.split(' ')[0] + ':';
+          
+          const value = document.createElement('span');
+          value.className = 'score-value';
+          value.textContent = moduleScores[module.id] + '%';
+          
+          scoreItem.appendChild(dot);
+          scoreItem.appendChild(label);
+          scoreItem.appendChild(value);
+          scoresEl.appendChild(scoreItem);
+        });
+        
+        scoresContainerEl.appendChild(scoresHeader);
+        scoresContainerEl.appendChild(scoresEl);
+        plotEl.appendChild(scoresContainerEl);
+        
+        // Star Chart with Emotional Response
+        const starChartContainer = document.createElement('div');
+        starChartContainer.className = 'star-chart-container';
+        
+        const starChartEl = document.createElement('div');
+        starChartEl.className = 'star-chart';
+        const svg = createStarChart(moduleScores, emotionalScore, 40);
+        starChartEl.appendChild(svg);
+        
+        const emotionalResponseEl = document.createElement('div');
+        emotionalResponseEl.className = 'emotional-response';
+        
+        const responseLabel = document.createElement('p');
+        responseLabel.className = 'response-label';
+        responseLabel.textContent = 'Emotional Response:';
+        
+        const responseValue = document.createElement('p');
+        responseValue.className = 'response-value';
+        responseValue.textContent = emotionalScore;
+        
+        emotionalResponseEl.appendChild(responseLabel);
+        emotionalResponseEl.appendChild(responseValue);
+        
+        starChartContainer.appendChild(starChartEl);
+        starChartContainer.appendChild(emotionalResponseEl);
+        plotEl.appendChild(starChartContainer);
+        
+        return plotEl;
+      }
+      
+      // Standard plot creation for non-Emma plots
       // Header with name and emoji
       const headerEl = document.createElement('div');
       headerEl.className = 'plot-header';
