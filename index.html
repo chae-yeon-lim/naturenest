@@ -128,10 +128,25 @@
       color: #4b5563;
     }
     
+    .star-chart-example {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .example-image {
+      margin-right: 12px;
+    }
+    
+    .example-text {
+      font-size: 0.75rem;
+      color: #4b5563;
+    }
+    
     /* Garden plots layout */
     .plots-container {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 12px;
       margin-bottom: 24px;
     }
@@ -737,15 +752,46 @@
           
           <div class="legend-section">
             <h3 class="legend-subtitle">Star Chart Elements</h3>
-            <div class="legend-items">
-              <div class="legend-item" style="width: 100%;">
-                <span class="legend-text"><b>Points:</b> Module completion % (farther = higher)</span>
+            <div class="star-chart-example">
+              <div class="example-image">
+                <svg width="120" height="110" viewBox="0 0 120 110">
+                  <!-- Background grid for clarity -->
+                  <line x1="60" y1="20" x2="60" y2="100" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="2,2"/>
+                  <line x1="20" y1="60" x2="100" y2="60" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="2,2"/>
+                  <circle cx="60" cy="60" r="40" stroke="#e5e7eb" stroke-width="1" stroke-dasharray="2,2" fill="none"/>
+                  
+                  <!-- Module axis -->
+                  <line x1="60" y1="60" x2="60" y2="20" stroke="#67c1a3" stroke-width="1" stroke-dasharray="2,2"/>
+                  <line x1="60" y1="60" x2="100" y2="60" stroke="#6db4ea" stroke-width="1" stroke-dasharray="2,2"/>
+                  <line x1="60" y1="60" x2="60" y2="100" stroke="#e582b4" stroke-width="1" stroke-dasharray="2,2"/>
+                  <line x1="60" y1="60" x2="20" y2="60" stroke="#f0c675" stroke-width="1" stroke-dasharray="2,2"/>
+                  
+                  <!-- Low completion vs High completion examples -->
+                  <circle cx="60" cy="36" r="6" fill="#67c1a3" stroke="white" stroke-width="1"/>
+                  <text x="65" y="36" font-size="8" fill="#000">80%</text>
+                  
+                  <circle cx="85" cy="60" r="6" fill="#6db4ea" stroke="white" stroke-width="1"/>
+                  <text x="90" y="60" font-size="8" fill="#000">65%</text>
+                  
+                  <circle cx="60" cy="85" r="5" fill="#e582b4" stroke="white" stroke-width="1"/>
+                  <text x="65" y="85" font-size="8" fill="#000">40%</text>
+                  
+                  <circle cx="35" cy="60" r="4" fill="#f0c675" stroke="white" stroke-width="1"/>
+                  <text x="25" y="60" font-size="8" fill="#000">30%</text>
+                  
+                  <!-- Central Emoji -->
+                  <text x="60" y="60" font-size="16" text-anchor="middle" dominant-baseline="middle">😊</text>
+                  
+                  <!-- Stem -->
+                  <line x1="60" y1="100" x2="60" y2="110" stroke="#43a047" stroke-width="2"/>
+                </svg>
               </div>
-              <div class="legend-item" style="width: 100%;">
-                <span class="legend-text"><b>Center Emoji:</b> Emotional wellbeing (😟 to 😄)</span>
-              </div>
-              <div class="legend-item" style="width: 100%;">
-                <span class="legend-text"><b>Score Scale:</b> 😟(50) 🙁(60) 😐(70) 🙂(80) 😄(90)</span>
+              <div class="example-text">
+                <p><b>Points:</b> Module completion % - farther from center means higher completion. 
+                   Points closer to the center (like the yellow dot at 30%) show lower module completion,
+                   while points farther out (like the green dot at 80%) show higher completion.</p>
+                <p><b>Center Emoji:</b> Emotional wellbeing (😟 to 😄)</p>
+                <p><b>Score Scale:</b> 😟(50) 🙁(60) 😐(70) 🙂(80) 😄(90)</p>
               </div>
             </div>
           </div>
@@ -1084,7 +1130,7 @@
   </div>
 
   <script>
-    // Sample data
+    // Define modules 
     const modules = [
       { id: 'urban-nature', name: 'Urban Nature Discovery', color: '#67c1a3' },
       { id: 'climate', name: 'Climate Champions', color: '#6db4ea' },
@@ -1092,121 +1138,49 @@
       { id: 'living', name: 'Living Systems', color: '#f0c675' }
     ];
     
+    // Complete gardener data - expanded to 40 as in original
     const gardeners = [
-      { id: 1, name: 'Alice Chen', experience: 'Intermediate', focus: 'Vegetables', years: 3, usage: 'High' },
-      { id: 2, name: 'Marcus Johnson', experience: 'Advanced', focus: 'Native Plants', years: 7, usage: 'Very High' },
-      { id: 3, name: 'Sofia Rodriguez', experience: 'Beginner', focus: 'Herbs', years: 1, usage: 'Medium' },
-      { id: 4, name: 'David Kim', experience: 'Advanced', focus: 'Pollinators', years: 10, usage: 'Very High' },
-      { id: 5, name: 'Priya Patel', experience: 'Intermediate', focus: 'Vegetables', years: 4, usage: 'High' },
-      { id: 6, name: 'Jamal Washington', experience: 'Beginner', focus: 'Herbs', years: 1, usage: 'Low' },
-      { id: 7, name: 'Emma Wilson', experience: 'Intermediate', focus: 'Flowers', years: 5, usage: 'Medium' },
-      { id: 8, name: 'Raj Sharma', experience: 'Advanced', focus: 'Vegetables', years: 8, usage: 'High' },
-      { id: 9, name: 'Olivia Martinez', experience: 'Beginner', focus: 'Flowers', years: 2, usage: 'Medium' },
-      { id: 10, name: 'Thomas Lee', experience: 'Advanced', focus: 'Food Forest', years: 6, usage: 'Very High' }
+      { id: 1, name: 'Alice Chen', age: 34, experience: 'Intermediate', focus: 'Vegetables', years: 3, usage: 'High' },
+      { id: 2, name: 'Marcus Johnson', age: 42, experience: 'Advanced', focus: 'Native Plants', years: 7, usage: 'Very High' },
+      { id: 3, name: 'Sofia Rodriguez', age: 28, experience: 'Beginner', focus: 'Herbs', years: 1, usage: 'Medium' },
+      { id: 4, name: 'David Kim', age: 56, experience: 'Advanced', focus: 'Pollinators', years: 10, usage: 'Very High' },
+      { id: 5, name: 'Priya Patel', age: 31, experience: 'Intermediate', focus: 'Vegetables', years: 4, usage: 'High' },
+      { id: 6, name: 'Jamal Washington', age: 25, experience: 'Beginner', focus: 'Herbs', years: 1, usage: 'Low' },
+      { id: 7, name: 'Emma Wilson', age: 38, experience: 'Intermediate', focus: 'Flowers', years: 5, usage: 'Medium' },
+      { id: 8, name: 'Raj Sharma', age: 44, experience: 'Advanced', focus: 'Vegetables', years: 8, usage: 'High' },
+      { id: 9, name: 'Olivia Martinez', age: 27, experience: 'Beginner', focus: 'Flowers', years: 2, usage: 'Medium' },
+      { id: 10, name: 'Thomas Lee', age: 52, experience: 'Advanced', focus: 'Food Forest', years: 6, usage: 'Very High' },
+      { id: 11, name: 'Fatima Ali', age: 36, experience: 'Intermediate', focus: 'Herbs', years: 4, usage: 'Medium' },
+      { id: 12, name: 'Samuel Nguyen', age: 30, experience: 'Intermediate', focus: 'Vegetables', years: 3, usage: 'High' },
+      { id: 13, name: 'Grace Williams', age: 63, experience: 'Advanced', focus: 'Native Plants', years: 15, usage: 'High' },
+      { id: 14, name: 'Mateo Garcia', age: 24, experience: 'Beginner', focus: 'Vegetables', years: 1, usage: 'Low' },
+      { id: 15, name: 'Aisha Robinson', age: 40, experience: 'Intermediate', focus: 'Pollinators', years: 5, usage: 'Medium' },
+      { id: 16, name: 'Jason Chen', age: 33, experience: 'Intermediate', focus: 'Native Plants', years: 4, usage: 'Medium' },
+      { id: 17, name: 'Maria Lopez', age: 45, experience: 'Advanced', focus: 'Herbs', years: 9, usage: 'High' },
+      { id: 18, name: 'Tyler Johnson', age: 29, experience: 'Beginner', focus: 'Vegetables', years: 2, usage: 'Medium' },
+      { id: 19, name: 'Leila Patel', age: 38, experience: 'Intermediate', focus: 'Pollinators', years: 6, usage: 'High' },
+      { id: 20, name: 'Derek Wilson', age: 51, experience: 'Advanced', focus: 'Food Forest', years: 12, usage: 'Very High' },
+      { id: 21, name: 'Zoe Chen', age: 26, experience: 'Beginner', focus: 'Flowers', years: 1, usage: 'Low' },
+      { id: 22, name: 'Anthony Rodriguez', age: 47, experience: 'Advanced', focus: 'Native Plants', years: 8, usage: 'High' },
+      { id: 23, name: 'Sarah Kim', age: 35, experience: 'Intermediate', focus: 'Vegetables', years: 5, usage: 'Medium' },
+      { id: 24, name: 'Miguel Santos', age: 31, experience: 'Intermediate', focus: 'Herbs', years: 3, usage: 'Medium' },
+      { id: 25, name: 'Yasmin Ali', age: 43, experience: 'Advanced', focus: 'Pollinators', years: 7, usage: 'High' },
+      { id: 26, name: 'Daniel Lee', age: 28, experience: 'Beginner', focus: 'Vegetables', years: 2, usage: 'Low' },
+      { id: 27, name: 'Amara Johnson', age: 39, experience: 'Intermediate', focus: 'Food Forest', years: 4, usage: 'High' },
+      { id: 28, name: 'Chen Wei', age: 56, experience: 'Advanced', focus: 'Native Plants', years: 20, usage: 'Very High' },
+      { id: 29, name: 'Isabella Martinez', age: 32, experience: 'Intermediate', focus: 'Herbs', years: 5, usage: 'Medium' },
+      { id: 30, name: 'Omar Hassan', age: 41, experience: 'Advanced', focus: 'Vegetables', years: 7, usage: 'High' },
+      { id: 31, name: 'Lily Wong', age: 27, experience: 'Beginner', focus: 'Flowers', years: 1, usage: 'Low' },
+      { id: 32, name: 'Jordan Taylor', age: 33, experience: 'Intermediate', focus: 'Pollinators', years: 4, usage: 'Medium' },
+      { id: 33, name: 'Elena Vasquez', age: 48, experience: 'Advanced', focus: 'Food Forest', years: 10, usage: 'Very High' },
+      { id: 34, name: 'Noah Wilson', age: 29, experience: 'Beginner', focus: 'Vegetables', years: 2, usage: 'Medium' },
+      { id: 35, name: 'Amina Gupta', age: 37, experience: 'Intermediate', focus: 'Native Plants', years: 6, usage: 'High' },
+      { id: 36, name: 'Dylan Carter', age: 44, experience: 'Advanced', focus: 'Herbs', years: 8, usage: 'High' },
+      { id: 37, name: 'Rosa Fernandez', age: 30, experience: 'Intermediate', focus: 'Vegetables', years: 3, usage: 'Medium' },
+      { id: 38, name: 'Jaiden Smith', age: 25, experience: 'Beginner', focus: 'Flowers', years: 1, usage: 'Low' },
+      { id: 39, name: 'Mei Lin', age: 52, experience: 'Advanced', focus: 'Pollinators', years: 15, usage: 'Very High' },
+      { id: 40, name: 'Community Plot', age: null, experience: 'Various', focus: 'Mixed', years: 5, usage: 'Very High' }
     ];
-    
-    // Precomputed module scores for each gardener
-    const gardenerModuleScores = [
-      // Alice Chen
-      { 'urban-nature': 65, 'climate': 45, 'sustainable': 85, 'living': 60 },
-      // Marcus Johnson
-      { 'urban-nature': 95, 'climate': 70, 'sustainable': 50, 'living': 80 },
-      // Sofia Rodriguez
-      { 'urban-nature': 60, 'climate': 30, 'sustainable': 55, 'living': 50 },
-      // David Kim
-      { 'urban-nature': 85, 'climate': 60, 'sustainable': 55, 'living': 95 },
-      // Priya Patel
-      { 'urban-nature': 70, 'climate': 50, 'sustainable': 90, 'living': 60 },
-      // Jamal Washington
-      { 'urban-nature': 60, 'climate': 30, 'sustainable': 55, 'living': 50 },
-      // Emma Wilson - special featured plot
-      { 'urban-nature': 75, 'climate': 45, 'sustainable': 65, 'living': 75 },
-      // Raj Sharma
-      { 'urban-nature': 70, 'climate': 50, 'sustainable': 90, 'living': 60 },
-      // Olivia Martinez
-      { 'urban-nature': 55, 'climate': 35, 'sustainable': 45, 'living': 55 },
-      // Thomas Lee
-      { 'urban-nature': 95, 'climate': 80, 'sustainable': 85, 'living': 95 }
-    ];
-    
-    // Emotional scores for each gardener
-    const emotionalScores = [75, 85, 65, 88, 78, 62, 76, 82, 67, 90];
-    
-    // Calculate activities based on focus
-    function getActivitiesForGardener(gardener) {
-      const activities = [];
-      
-      switch(gardener.focus) {
-        case 'Vegetables':
-          activities.push(
-            { name: 'Heirloom Seed Saving', module: 'urban-nature', frequency: 'Weekly' },
-            { name: 'Water Conservation', module: 'climate', frequency: 'Daily' },
-            { name: 'Food Sharing', module: 'sustainable', frequency: 'Bi-weekly' }
-          );
-          break;
-        case 'Native Plants':
-          activities.push(
-            { name: 'Biodiversity Monitoring', module: 'urban-nature', frequency: 'Weekly' },
-            { name: 'Drought Resistance Demo', module: 'climate', frequency: 'Monthly' },
-            { name: 'Indigenous Knowledge Sharing', module: 'sustainable', frequency: 'Monthly' }
-          );
-          break;
-        case 'Herbs':
-          activities.push(
-            { name: 'Medicinal Plant Care', module: 'urban-nature', frequency: 'Weekly' },
-            { name: 'Companion Planting', module: 'living', frequency: 'Monthly' },
-            { name: 'Community Herb Sharing', module: 'sustainable', frequency: 'Bi-weekly' }
-          );
-          break;
-        case 'Pollinators':
-          activities.push(
-            { name: 'Bee Habitat Creation', module: 'living', frequency: 'Monthly' },
-            { name: 'Butterfly Monitoring', module: 'urban-nature', frequency: 'Weekly' },
-            { name: 'Pollinator Education', module: 'sustainable', frequency: 'Monthly' }
-          );
-          break;
-        case 'Flowers':
-          activities.push(
-            { name: 'Seasonal Blooming', module: 'urban-nature', frequency: 'Monthly' },
-            { name: 'Cutting Garden', module: 'sustainable', frequency: 'Weekly' },
-            { name: 'Pollinator Support', module: 'living', frequency: 'Daily' }
-          );
-          break;
-        case 'Food Forest':
-          activities.push(
-            { name: 'Ecosystem Design', module: 'urban-nature', frequency: 'Monthly' },
-            { name: 'Carbon Sequestration', module: 'climate', frequency: 'Ongoing' },
-            { name: 'Multi-layer Planting', module: 'living', frequency: 'Seasonal' }
-          );
-          break;
-        default:
-          activities.push(
-            { name: 'Garden Activity', module: 'sustainable', frequency: 'Weekly' }
-          );
-      }
-      
-      return activities;
-    }
-    
-    // Get plants based on focus
-    function getPlantsForGardener(gardener) {
-      switch(gardener.focus) {
-        case 'Vegetables':
-          return ['Tomatoes', 'Peppers', 'Kale', 'Carrots'];
-        case 'Herbs':
-          return ['Basil', 'Mint', 'Rosemary', 'Thyme'];
-        case 'Native Plants':
-          return ['Milkweed', 'Coneflower', 'Goldenrod'];
-        case 'Pollinators':
-          return ['Lavender', 'Bee Balm', 'Sunflower'];
-        case 'Flowers':
-          return ['Zinnia', 'Marigold', 'Cosmos'];
-        case 'Food Forest':
-          return ['Apple Trees', 'Berry Bushes', 'Ground Herbs'];
-        default:
-          return ['Various Plants'];
-      }
-    }
     
     // Helper functions
     function getFocusEmoji(focus) {
@@ -1217,6 +1191,7 @@
         case 'Pollinators': return "🐝";
         case 'Flowers': return "🌸";
         case 'Food Forest': return "🌳";
+        case 'Mixed': return "🌱";
         default: return "🌱";
       }
     }
@@ -1239,6 +1214,7 @@
         case 'Pollinators': return '#ffa000';
         case 'Flowers': return '#e64a19';
         case 'Food Forest': return '#795548';
+        case 'Mixed': return '#757575';
         default: return '#757575';
       }
     }
@@ -1249,6 +1225,88 @@
       if (score >= 55) return "😐";
       if (score >= 40) return "🙁";
       return "😟";
+    }
+    
+    // Generate module scores based on gardener characteristics
+    function generateModuleScores(gardener) {
+      let moduleScores = {};
+      
+      // Adjust module strengths based on gardener focus
+      if (gardener.focus === 'Vegetables') {
+        moduleScores = {
+          'urban-nature': 60 + Math.floor(Math.random() * 20),
+          'climate': 40 + Math.floor(Math.random() * 20),
+          'sustainable': 80 + Math.floor(Math.random() * 15),
+          'living': 50 + Math.floor(Math.random() * 20)
+        };
+      } else if (gardener.focus === 'Native Plants') {
+        moduleScores = {
+          'urban-nature': 90 + Math.floor(Math.random() * 10),
+          'climate': 60 + Math.floor(Math.random() * 20),
+          'sustainable': 40 + Math.floor(Math.random() * 20),
+          'living': 75 + Math.floor(Math.random() * 15)
+        };
+      } else if (gardener.focus === 'Herbs') {
+        moduleScores = {
+          'urban-nature': 70 + Math.floor(Math.random() * 15),
+          'climate': 30 + Math.floor(Math.random() * 20),
+          'sustainable': 65 + Math.floor(Math.random() * 15),
+          'living': 60 + Math.floor(Math.random() * 20)
+        };
+      } else if (gardener.focus === 'Pollinators') {
+        moduleScores = {
+          'urban-nature': 75 + Math.floor(Math.random() * 15),
+          'climate': 50 + Math.floor(Math.random() * 20),
+          'sustainable': 45 + Math.floor(Math.random() * 15),
+          'living': 90 + Math.floor(Math.random() * 10)
+        };
+      } else if (gardener.focus === 'Flowers') {
+        moduleScores = {
+          'urban-nature': 65 + Math.floor(Math.random() * 15),
+          'climate': 35 + Math.floor(Math.random() * 20),
+          'sustainable': 55 + Math.floor(Math.random() * 15),
+          'living': 65 + Math.floor(Math.random() * 20)
+        };
+      } else if (gardener.focus === 'Food Forest') {
+        moduleScores = {
+          'urban-nature': 85 + Math.floor(Math.random() * 15),
+          'climate': 70 + Math.floor(Math.random() * 15),
+          'sustainable': 75 + Math.floor(Math.random() * 15),
+          'living': 85 + Math.floor(Math.random() * 15)
+        };
+      } else {
+        // Mixed/Community plot
+        moduleScores = {
+          'urban-nature': 70 + Math.floor(Math.random() * 20),
+          'climate': 60 + Math.floor(Math.random() * 20),
+          'sustainable': 70 + Math.floor(Math.random() * 20),
+          'living': 65 + Math.floor(Math.random() * 20)
+        };
+      }
+      
+      // Adjust by experience level
+      if (gardener.experience === 'Advanced') {
+        Object.keys(moduleScores).forEach(key => {
+          moduleScores[key] = Math.min(100, moduleScores[key] + 10);
+        });
+      } else if (gardener.experience === 'Beginner') {
+        Object.keys(moduleScores).forEach(key => {
+          moduleScores[key] = Math.max(30, moduleScores[key] - 10);
+        });
+      }
+      
+      return moduleScores;
+    }
+    
+    // Calculate emotional score based on gardener characteristics
+    function calculateEmotionalScore(gardener) {
+      const baseEmotion = 60;
+      const experienceBonus = gardener.experience === 'Advanced' ? 15 : 
+                           gardener.experience === 'Intermediate' ? 10 : 5;
+      const yearsBonus = Math.min(10, gardener.years * 2);
+      const randomFactor = Math.floor(Math.random() * 10);
+      
+      return Math.min(95, baseEmotion + experienceBonus + yearsBonus + randomFactor);
     }
     
     // Create SVG star chart
@@ -1341,10 +1399,88 @@
       return svg;
     }
     
+    // Calculate activities based on focus
+    function getActivitiesForGardener(gardener) {
+      const activities = [];
+      
+      switch(gardener.focus) {
+        case 'Vegetables':
+          activities.push(
+            { name: 'Heirloom Seed Saving', module: 'urban-nature', frequency: 'Weekly' },
+            { name: 'Water Conservation', module: 'climate', frequency: 'Daily' },
+            { name: 'Food Sharing', module: 'sustainable', frequency: 'Bi-weekly' }
+          );
+          break;
+        case 'Native Plants':
+          activities.push(
+            { name: 'Biodiversity Monitoring', module: 'urban-nature', frequency: 'Weekly' },
+            { name: 'Drought Resistance Demo', module: 'climate', frequency: 'Monthly' },
+            { name: 'Indigenous Knowledge Sharing', module: 'sustainable', frequency: 'Monthly' }
+          );
+          break;
+        case 'Herbs':
+          activities.push(
+            { name: 'Medicinal Plant Care', module: 'urban-nature', frequency: 'Weekly' },
+            { name: 'Companion Planting', module: 'living', frequency: 'Monthly' },
+            { name: 'Community Herb Sharing', module: 'sustainable', frequency: 'Bi-weekly' }
+          );
+          break;
+        case 'Pollinators':
+          activities.push(
+            { name: 'Bee Habitat Creation', module: 'living', frequency: 'Monthly' },
+            { name: 'Butterfly Monitoring', module: 'urban-nature', frequency: 'Weekly' },
+            { name: 'Pollinator Education', module: 'sustainable', frequency: 'Monthly' }
+          );
+          break;
+        case 'Flowers':
+          activities.push(
+            { name: 'Seasonal Blooming', module: 'urban-nature', frequency: 'Monthly' },
+            { name: 'Cutting Garden', module: 'sustainable', frequency: 'Weekly' },
+            { name: 'Pollinator Support', module: 'living', frequency: 'Daily' }
+          );
+          break;
+        case 'Food Forest':
+          activities.push(
+            { name: 'Ecosystem Design', module: 'urban-nature', frequency: 'Monthly' },
+            { name: 'Carbon Sequestration', module: 'climate', frequency: 'Ongoing' },
+            { name: 'Multi-layer Planting', module: 'living', frequency: 'Seasonal' }
+          );
+          break;
+        default:
+          activities.push(
+            { name: 'Garden Activity', module: 'sustainable', frequency: 'Weekly' }
+          );
+      }
+      
+      return activities;
+    }
+    
+    // Get plants based on focus
+    function getPlantsForGardener(gardener) {
+      switch(gardener.focus) {
+        case 'Vegetables':
+          return ['Tomatoes', 'Peppers', 'Kale', 'Carrots'];
+        case 'Herbs':
+          return ['Basil', 'Mint', 'Rosemary', 'Thyme'];
+        case 'Native Plants':
+          return ['Milkweed', 'Coneflower', 'Goldenrod'];
+        case 'Pollinators':
+          return ['Lavender', 'Bee Balm', 'Sunflower'];
+        case 'Flowers':
+          return ['Zinnia', 'Marigold', 'Cosmos'];
+        case 'Food Forest':
+          return ['Apple Trees', 'Berry Bushes', 'Ground Herbs'];
+        case 'Mixed':
+          return ['Various Plants', 'Community Crops', 'Mixed Herbs'];
+        default:
+          return ['Various Plants'];
+      }
+    }
+    
     // Create plot elements
     function createPlotElement(gardener, index) {
-      const moduleScores = gardenerModuleScores[index];
-      const emotionalScore = emotionalScores[index];
+      const moduleScores = generateModuleScores(gardener);
+      const emotionalScore = calculateEmotionalScore(gardener);
       const isEmmaWilson = gardener.id === 7;
       
       const plotEl = document.createElement('div');
